@@ -1,36 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Websocket example</title>
-</head>
+{% extends 'base.html' %}
 
-<style>
+{% load messages %}
 
-    body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #333;
-    }
+{% block content %}
+    <div id="messages">
+        <div class="author-messages-container">
+            {% with messages|format_messages as formatted_messages %}
+                {% for group in formatted_messages %}
+                    <p class="greetings">{{ group.author }} disse:</p>
+                    <div data-author="{{ group.author }}">
+                        <div class="message">
+                            {% for message in group.messages %}
+                                <p>{{ message.content }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endwith %}
+        </div>
+    </div>
 
-    #number {
-        font-size: 1.6rem;
-        color: white;
-    }
+    <div style="display: flex; width: 100%; justify-content: center; gap: 1rem; margin: 2rem; height: 50px; width: 620px;">
+        <input placeholder="digite uma mensagem" id="input">
+        <button onclick="sendMessage('{{room_name}}')">Enviar</button>
+    </div>
 
-</style>
-<body>
-<p id="number"></p>
-<script>
-    const socket = new WebSocket("ws://localhost:8000/ws/");
+    <script>
+        const roomName = "{{ room_name }}"
+        const socket = new WebSocket(`ws://localhost:8000/ws/chat/${roomName}/`);
+    </script>
 
-    socket.onmessage = function (event) {
-        const data = JSON.parse(event.data);
-        console.log(data);
-        document.querySelector('#number').innerHTML = data.number;
-    }
-</script>
-</body>
-</html>
+{% endblock %}
